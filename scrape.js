@@ -1,34 +1,37 @@
+// Define Needed Resources
 const request = require("request"), 
     fs = require("fs"), 
     _cliProgress = require("cli-progress");
 var https = require("follow-redirects").https;
 
+// Get User Input For URL
 const readline = require("readline").createInterface({
     input: process.stdin,
     output: process.stdout
   });
-  CheckLine();
-  function CheckLine(){
+  getInput();
+  function getInput(){
   readline.question("What video can I fetch today? URL: ", UserURL => {
-    //console.log(`You input the URL ${URL}`);
-    let WistiaURL = UserURL
+    let WistiaURL = UserURL;
     readline.close();
     var setSearch = ".wistia.com/medias/";
     if (UserURL.includes(setSearch)) {
-        URLPassthrough(WistiaURL);
+        getUniqueURL(WistiaURL);
     } else {
-        console.log("Sorry, that link is not valid. Please come back with a Wistia Medias link. Example: [*.wistia.com/medias/*]")
+        console.log("Sorry, that link is not valid. Please come back with a Wistia Medias link. Example: [*.wistia.com/medias/*]");
     }
   });
 }
 
-function URLPassthrough(WistiaURL) {
+// Get UniqueURL Identifier
+function getUniqueURL(WistiaURL) {
     var domain = WistiaURL.split("/");
     let URLReturn = (domain[domain.length - 1]);
-    TestFlight(URLReturn);
+    parseJSON(URLReturn);
 }
 
-function TestFlight (URLReturn) {
+// Turn Response Into JSON
+function parseJSON(URLReturn) {
     var options = {
     "method": "GET",
     "hostname": "fast.wistia.com",
@@ -48,7 +51,7 @@ function TestFlight (URLReturn) {
     res.on("end", function (chunk) {
         var body = Buffer.concat(chunks);
         var JSONPulling = body;
-        testCall(JSONPulling)
+        checkIfOnline(JSONPulling)
     });
 
     res.on("error", function (error) {
@@ -59,10 +62,39 @@ function TestFlight (URLReturn) {
     req.end();
 
 }
-function testCall(JSONPulling){
+
+// Check If The File Exists
+function checkIfOnline(JSONPulling){
     const obj = JSON.parse(JSONPulling);
     var OnlineCheck = obj.media;
     if (OnlineCheck != undefined){
+        checkRegex(obj);
+} else {
+    console.log("Unfortunately, this video either doesn't exist or has been removed by the author.");
+    }
+}
+
+// Since The File Exists, Regex For Bad Names
+function checkRegex(obj){
+    var OriginalName = obj.media.name;
+    FinalName = OriginalName.replace(/[/\\?%*:|"<>]/g, '-');
+    checkFolder(FinalName, obj);
+}
+
+// Check If Project Downloads Folder Exists, If Not, Create One
+function checkFolder(FinalName, obj){
+    var Directory = "./Downloads";
+
+    if (!fs.existsSync(Directory)){
+        fs.mkdirSync(Directory);
+        downloadVideo(FinalName, obj);
+    } else if (fs.existsSync(Directory)){
+        downloadVideo(FinalName, obj);
+    }
+}
+
+// Download The Final Video To Project Downloads Folder
+function downloadVideo(FinalName, obj){
     const download = (url, filename, callback) => {
 
         const progressBar = new _cliProgress.SingleBar({
@@ -70,9 +102,8 @@ function testCall(JSONPulling){
         }, _cliProgress.Presets.shades_classic);
     
         const file = fs.createWriteStream(filename);
-        let receivedBytes = 0
-        
-    
+        let receivedBytes = 0;
+
         request.get(url)
         .on("response", (response) => {
             if (response.statusCode !== 200) {
@@ -92,24 +123,20 @@ function testCall(JSONPulling){
             progressBar.stop();
             return callback(err.message);
         });
-    
+        
         file.on("finish", () => {
             progressBar.stop();
             file.close(callback);
             console.log("Finished!");
         });
-    
+
         file.on("error", (err) => {
             fs.unlink(filename); 
             progressBar.stop();
             return callback(err.message);
         });
     }
-    
-    
-    const fileUrl = obj.media.assets[0].url;
-    download(fileUrl, obj.media.channelTitle + "_" + obj.media.projectId + ".mp4", () => {});
-} else {
-    console.log("Unfortunately, this video either doesn't exist or has been removed by the author.")
-}
+
+    const fileURL = obj.media.assets[0].url;
+    download(fileURL, "./Downloads/" + FinalName + ".mp4", () => {});
 }
