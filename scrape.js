@@ -17,7 +17,7 @@ const readline = require("readline").createInterface({
     if (UserURL.includes(setSearch)) {
         URLPassthrough(WistiaURL);
     } else {
-        console.log("Please come back with a Wistia Medias link. Example: [*.wistia.com/medias/*]")
+        console.log("Sorry, that link is not valid. Please come back with a Wistia Medias link. Example: [*.wistia.com/medias/*]")
     }
   });
 }
