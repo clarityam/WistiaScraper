@@ -1,0 +1,26 @@
+{
+  "name": "wistiascraper",
+  "version": "1.0.0",
+  "description": "Scrapes videos from Wistia's PoopCDN to enable users to download the video instead.",
+  "main": "scrape.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CarbonTTV/WistiaScraper.git"
+  },
+  "keywords": [
+    "Wistia"
+  ],
+  "author": "OneClarity",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/CarbonTTV/WistiaScraper/issues"
+  },
+  "homepage": "https://github.com/CarbonTTV/WistiaScraper#readme",
+  "dependencies": {
+    "cli-progress": "^3.8.2",
+    "request": "^2.88.2"
+  }
+}
