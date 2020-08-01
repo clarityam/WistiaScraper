@@ -61,6 +61,8 @@ function TestFlight (URLReturn) {
 }
 function testCall(JSONPulling){
     const obj = JSON.parse(JSONPulling);
+    var OnlineCheck = obj.media;
+    if (OnlineCheck != undefined){
     const download = (url, filename, callback) => {
 
         const progressBar = new _cliProgress.SingleBar({
@@ -94,6 +96,7 @@ function testCall(JSONPulling){
         file.on("finish", () => {
             progressBar.stop();
             file.close(callback);
+            console.log("Finished!");
         });
     
         file.on("error", (err) => {
@@ -106,4 +109,7 @@ function testCall(JSONPulling){
     
     const fileUrl = obj.media.assets[0].url;
     download(fileUrl, obj.media.channelTitle + "_" + obj.media.projectId + ".mp4", () => {});
+} else {
+    console.log("Unfortunately, this video either doesn't exist or has been removed by the author.")
+}
 }
