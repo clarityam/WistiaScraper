@@ -4,6 +4,10 @@ const request = require("request"),
     _cliProgress = require("cli-progress");
 var https = require("follow-redirects").https;
 
+console.log("==========================================================");
+console.log("          Welcome to Clarity's Wistia Scraper!")
+console.log("==========================================================");
+
 // Get User Input For URL
 const readline = require("readline").createInterface({
     input: process.stdin,
@@ -11,7 +15,7 @@ const readline = require("readline").createInterface({
   });
   getInput();
   function getInput(){
-  readline.question("What video can I fetch today? URL: ", UserURL => {
+  readline.question("What video should I fetch today? URL: ", UserURL => {
     let WistiaURL = UserURL;
     readline.close();
     var setSearch = ".wistia.com/medias/";
@@ -77,8 +81,12 @@ function checkIfOnline(JSONPulling){
 // Since The File Exists, Regex For Bad Names
 function checkRegex(obj){
     var OriginalName = obj.media.name;
+    var ChannelName = obj.media.channelTitle;
     FinalName = OriginalName.replace(/[/\\?%*:|"<>]/g, '-');
     checkFolder(FinalName, obj);
+    console.log("=====================================================================");
+    console.log("Now Fetching /// Title: " + FinalName + " /// Author: " + ChannelName);
+    console.log("=====================================================================");
 }
 
 // Check If Project Downloads Folder Exists, If Not, Create One
